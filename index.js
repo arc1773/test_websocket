@@ -23,7 +23,8 @@ const http = require("http");
 const WebSocketServer = require("websocket").server;
 
 const app = express();
-const port = process.env.PORT || 8080;
+//const port = process.env.PORT || 8080;
+const port = 443
 
 // Serwowanie statycznych plików z katalogu "public"
 app.use(express.static(path.join(__dirname, "public")));
