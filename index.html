@@ -50,6 +50,7 @@
       });
 
       ws.onmessage = (message) => {
+	console.log(ws.readyState)
         //message.data
         const response = JSON.parse(message.data);
 
