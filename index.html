@@ -36,7 +36,7 @@
           clientId: clientId,
           gameId: gameId,
         };
-
+	console.log(ws.readyState)
         ws.send(JSON.stringify(payLoad));
       });
 
