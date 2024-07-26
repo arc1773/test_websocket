@@ -19,7 +19,7 @@ const games = {};
 
 const express = require("express");
 const path = require("path");
-const http = require("http");
+const https = require("https");
 const WebSocketServer = require("websocket").server;
 
 const app = express();
@@ -29,7 +29,7 @@ const port = process.env.PORT || 8080;
 app.use(express.static(path.join(__dirname, "public")));
 
 // Utworzenie serwera HTTP
-const httpServer = http.createServer(app);
+const httpServer = https.createServer(app);
 
 // Nasłuchiwanie na określonym porcie
 httpServer.listen(port, () => {
