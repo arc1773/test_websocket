@@ -36,7 +36,6 @@
           clientId: clientId,
           gameId: gameId,
         };
-	console.log(ws.readyState)
         ws.send(JSON.stringify(payLoad));
       });
 
@@ -50,7 +49,6 @@
       });
 
       ws.onmessage = (message) => {
-	console.log(ws.readyState)
         //message.data
         const response = JSON.parse(message.data);
 
@@ -116,6 +114,7 @@
         }
         
         if (response.method === "update") {
+            console.log("uptate")
             if(!response.game.state) return
             for(const b of Object.keys(response.game.state)){
                 const color = response.game.state[b]

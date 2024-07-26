@@ -139,7 +139,7 @@ function updateGameState(){
         })
     }
 
-    setTimeout(updateGameState, 500)
+    setTimeout(updateGameState, 40)
 }
 
 
