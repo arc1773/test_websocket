@@ -18,7 +18,7 @@
       let gameId = null;
       let playerColor = null;
 
-      let ws = new WebSocket("wss://testwebsocket-production.up.railway.app:9090");
+      let ws = new WebSocket(`ws://${window.location.host}`);
       const btnCreate = document.getElementById("btnCreate");
       const btnJoin = document.getElementById("btnJoin");
       const txtgameId = document.getElementById("txtGameId");

@@ -1,21 +1,45 @@
-const { response } = require("express");
-const http = require("http");
-const app = require("express")();
-app.get("/", (req, res)=> res.sendFile(__dirname + "/index.html"))
-
-app.listen(9091, ()=>console.log("listening on htttp port 9091"))
-const websocketServer = require("websocket").server
-const httpserver = http.createServer()
-const port = process.env.PORT || 9090;
-httpserver.listen(port, () => console.log("My server is slistening on port 9090"))
+//const { response } = require("express");
+//const http = require("http");
+//const app = require("express")();
+//app.get("/", (req, res)=> res.sendFile(__dirname + "/index.html"))
+//
+//app.listen(9091, ()=>console.log("listening on htttp port 9091"))
+//const websocketServer = require("websocket").server
+//const httpserver = http.createServer()
+//const port = process.env.PORT || 9090;
+//httpserver.listen(port, () => console.log("My server is slistening on port 9090"))
 
 //hasmap
 const clients = {};
 const games = {};
 
-const wsServer = new websocketServer({
-    "httpServer": httpserver
-})
+//const wsServer = new websocketServer({
+//    "httpServer": httpserver
+//})
+
+const express = require("express");
+const path = require("path");
+const http = require("http");
+const WebSocketServer = require("websocket").server;
+
+const app = express();
+const port = process.env.PORT || 9091;
+
+// Serwowanie statycznych plików z katalogu "public"
+app.use(express.static(path.join(__dirname, "public")));
+
+// Utworzenie serwera HTTP
+const httpServer = http.createServer(app);
+
+// Nasłuchiwanie na określonym porcie
+httpServer.listen(port, () => {
+    console.log(`App listening on port: ${port}`);
+});
+
+// Utworzenie serwera WebSocket
+const wsServer = new WebSocketServer({
+    httpServer: httpServer
+});
 
 wsServer.on("request", request=> {
     //connect
