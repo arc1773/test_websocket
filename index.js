@@ -6,7 +6,8 @@ app.get("/", (req, res)=> res.sendFile(__dirname + "/index.html"))
 app.listen(9091, ()=>console.log("listening on htttp port 9091"))
 const websocketServer = require("websocket").server
 const httpserver = http.createServer()
-httpserver.listen(9090, () => console.log("My server is slistening on port 9090"))
+PORT = 9090
+httpserver.listen(PORT, () => console.log(`My server is slistening on port ${PORT}`))
 
 //hasmap
 const clients = {};
