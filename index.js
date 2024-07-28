@@ -1,22 +1,3 @@
-//const { response } = require("express");
-//const http = require("http");
-//const app = require("express")();
-//app.get("/", (req, res)=> res.sendFile(__dirname + "/index.html"))
-//
-//app.listen(9091, ()=>console.log("listening on htttp port 9091"))
-//const websocketServer = require("websocket").server
-//const httpserver = http.createServer()
-//const port = process.env.PORT || 9090;
-//httpserver.listen(port, () => console.log("My server is slistening on port 9090"))
-
-//hasmap
-const clients = {};
-const games = {};
-
-//const wsServer = new websocketServer({
-//    "httpServer": httpserver
-//})
-
 const express = require("express");
 const path = require("path");
 const http = require("http");
@@ -24,7 +5,7 @@ const WebSocketServer = require("websocket").server;
 
 const app = express();
 //const port = process.env.PORT || 8080;
-const port = 443
+const port = 443;
 
 // Serwowanie statycznych plików z katalogu "public"
 app.use(express.static(path.join(__dirname, "public")));
@@ -34,118 +15,79 @@ const httpServer = http.createServer(app);
 
 // Nasłuchiwanie na określonym porcie
 httpServer.listen(port, () => {
-    console.log(`App listening on port: ${port}`);
+  console.log(`App listening on port: ${port}`);
 });
 
 // Utworzenie serwera WebSocket
 const wsServer = new WebSocketServer({
-    httpServer: httpServer
+  httpServer: httpServer,
 });
 
-wsServer.on("request", request=> {
-    //connect
-    const connection = request.accept(null, request.origin)
-    connection.on("open", ()=> console.log("Opened!!!"))
-    connection.on("close", ()=> console.log("CLOSED!!!"))
-    connection.on("message", message=> {
-        const result = JSON.parse(message.utf8Data)
+const clients = {};
+const game_data = {
+  clients: {},
+};
 
-        if(result.method === "create"){
-            const clientId = result.clientId;
-            const gameId = guid();
-            games[gameId] = {
-                "id": gameId,
-                "balls": 20,
-                "clients":[]
-            }
+wsServer.on("request", (request) => {
+  //connect
+  const connection = request.accept(null, request.origin);
+  connection.on("open", () => console.log("Opened!!!"));
+  connection.on("close", () => console.log("CLOSED!!!"));
+  connection.on("message", (message) => {
+    const result = JSON.parse(message.utf8Data);
 
-            const payLoad = {
-                "method":"create",
-                "game": games[gameId]
-            }
+    if (result.method === "join") {
+      const clientId = result.clientId;
 
-            const con = clients[clientId].connection;
-            con.send(JSON.stringify(payLoad));
+      game_data.clients[clientId] = {
+        position: { x: 100, y: 100 },
+      };
+      const game = game_data;
+      const payLoad = {
+        method: "join",
+        game: game,
+      };
+      clients[clientId].connection.send(JSON.stringify(payLoad));
+      updateGameState();
 
-
-        }
-        if(result.method === "join"){
-            const clientId = result.clientId;
-            const gameId = result.gameId
-            const game = games[gameId];
-            if(game.clients.length >= 3){
-                return;
-            }
-            const color = {"0": "Red", "1": "Green", "2":"Blue"}[game.clients.length]
-            game.clients.push({
-                "clientId": clientId,
-                "color": color,
-            })
-            //start the game
-            if(game.clients.length === 3) updateGameState()
-
-            const payLoad = {
-                "method":"join",
-                "game": game
-            }
-
-            game.clients.forEach(c => {
-                clients[c.clientId].connection.send(JSON.stringify(payLoad))
-            });
-
-        }
-        if(result.method === "play"){
-            const clientId = result.clientId;
-            const gameId = result.gameId;
-            const ballId = result.ballId;
-            const color = result.color
-            let state = games[gameId].state;
-            if(!state){
-                state={}
-            }
-
-            state[ballId] = color
-            games[gameId].state = state;
-
-            const game = games[gameId]
-
-        }
-    })
-
-    const clientId = guid()
-    clients[clientId]={
-        "connection":connection
-    };
-
-    const payLoad = {
-        "method":"connect",
-        "clientId":clientId
+      //game.clients.forEach(c => {
+      //    clients[c.clientId].connection.send(JSON.stringify(payLoad))
+      //});
     }
-    //send back the client connect
-    connection.send(JSON.stringify(payLoad))
+    if (result.method === "play") {
+      const clientId = result.clientId;
 
-})
-
-function updateGameState(){
-    for (const g of Object.keys(games)){
-        const game = games[g]
-        const payLoad = {
-            method: "update",
-            game: game
-        }
-        game.clients.forEach(c=>{
-            //console.log(clients)
-            clients[c.clientId].connection.send(JSON.stringify(payLoad))
-        })
+      game_data.clients[clientId].position = result.position;
     }
+  });
 
-    setTimeout(updateGameState, 20)
+  const clientId = guid();
+  clients[clientId] = {
+    connection: connection,
+  };
+
+  const payLoad = {
+    method: "connect",
+    clientId: clientId,
+  };
+  //send back the client connect
+  connection.send(JSON.stringify(payLoad));
+});
+
+function updateGameState() {
+  const payLoad = {
+    method: "update",
+    game_data: game_data,
+  };
+  for (const client in clients) {
+    clients[client].connection.send(JSON.stringify(payLoad));
+  }
+
+  setTimeout(updateGameState, 20);
 }
 
-
-
-function S4(){
-    return (((1+Math.random())*0x10000)|0).toString(16).substring()
+function S4() {
+  return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring();
 }
 
-const guid = () => (S4()+S4()+"-"+S4()+"-4" + S4().substring())
+const guid = () => S4() + S4() + "-" + S4() + "-4" + S4().substring();
