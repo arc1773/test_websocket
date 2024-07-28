@@ -3,7 +3,7 @@ let clientId = null;
 
 var is_game = false;
 //let ws = new WebSocket(`wss://testwebsocket-production.up.railway.app:443`);
-let ws = new WebSocket(`ws://localhost:443`);
+let ws = new WebSocket(`wss://testwebsocket-production.up.railway.app:443`);
 //const btnJoin = document.getElementById("btnJoin");
 
 //writing events
@@ -31,14 +31,7 @@ ws.addEventListener("message", (event) => {
     console.log("you joined");
     game_data = response.game;
   }
-
-  //if (response.method === "update") {
-  //  console.log("uptate");
-  //  if (!response.game.state) return;
-  //}
-
   if (response.method === "update") {
-    console.log("uptate");
     game_data = response.game_data
   }
 });
