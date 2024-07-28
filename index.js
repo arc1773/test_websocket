@@ -1,11 +1,34 @@
+function send_data(data_f) {
+  const data = data_f;
+  const jsonString = JSON.stringify(data);
+  const encoder = new TextEncoder();
+  const jsonBytes = encoder.encode(jsonString);
+  let binaryRepresentation = "";
+  jsonBytes.forEach((byte) => {
+    binaryRepresentation += byte.toString(2).padStart(8, "0");
+  });
+  return binaryRepresentation;
+}
+function get_data(data) {
+  const binaryRepresentation = data;
+
+  const byteArray = [];
+  for (let i = 0; i < binaryRepresentation.length; i += 8) {
+    byteArray.push(parseInt(binaryRepresentation.substr(i, 8), 2));
+  }
+  const decoder = new TextDecoder();
+  const jsonString = decoder.decode(new Uint8Array(byteArray));
+  const got_data = JSON.parse(jsonString);
+  return got_data;
+}
 const express = require("express");
 const path = require("path");
 const http = require("http");
 const WebSocketServer = require("websocket").server;
 
 const app = express();
-const compression = require('compression');
-app.use(compression());
+//const compression = require('compression');
+//app.use(compression());
 //const port = process.env.PORT || 8080;
 const port = 443;
 
@@ -36,7 +59,7 @@ wsServer.on("request", (request) => {
   connection.on("open", () => console.log("Opened!!!"));
   connection.on("close", () => console.log("CLOSED!!!"));
   connection.on("message", (message) => {
-    const result = JSON.parse(message.utf8Data);
+    const result = get_data(message.utf8Data);
 
     if (result.method === "join") {
       const clientId = result.clientId;
@@ -49,12 +72,8 @@ wsServer.on("request", (request) => {
         method: "join",
         game: game,
       };
-      clients[clientId].connection.send(JSON.stringify(payLoad));
+      clients[clientId].connection.send(send_data(payLoad));
       updateGameState();
-
-      //game.clients.forEach(c => {
-      //    clients[c.clientId].connection.send(JSON.stringify(payLoad))
-      //});
     }
     if (result.method === "play") {
       const clientId = result.clientId;
@@ -72,8 +91,7 @@ wsServer.on("request", (request) => {
     method: "connect",
     clientId: clientId,
   };
-  //send back the client connect
-  connection.send(JSON.stringify(payLoad));
+  connection.send(send_data(payLoad));
 });
 
 function updateGameState() {
@@ -82,7 +100,7 @@ function updateGameState() {
     game_data: game_data,
   };
   for (const client in clients) {
-    clients[client].connection.send(JSON.stringify(payLoad));
+    clients[client].connection.send(send_data(payLoad));
   }
 
   setTimeout(updateGameState, 20);

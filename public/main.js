@@ -1,10 +1,36 @@
 // HTML elements
+
+function send_data(data_f) {
+  const data = data_f
+  const jsonString = JSON.stringify(data);
+  const encoder = new TextEncoder();
+  const jsonBytes = encoder.encode(jsonString);
+  let binaryRepresentation = "";
+  jsonBytes.forEach((byte) => {
+    binaryRepresentation += byte.toString(2).padStart(8, "0");
+  });
+  return binaryRepresentation
+}
+function get_data(data) {
+  const binaryRepresentation = data;
+
+  const byteArray = [];
+  for (let i = 0; i < binaryRepresentation.length; i += 8) {
+    byteArray.push(parseInt(binaryRepresentation.substr(i, 8), 2));
+  }
+  const decoder = new TextDecoder();
+  const jsonString = decoder.decode(new Uint8Array(byteArray));
+  const got_data = JSON.parse(jsonString);
+  return got_data;
+}
+
 let clientId = null;
 
 var is_game = false;
 let ws = new WebSocket(`wss://testwebsocket-production.up.railway.app:443`);
 //let ws = new WebSocket(`ws://localhost:443`);
 
+ws.binaryType = "arraybuffer";
 
 //writing events
 var game_data = {};
@@ -15,23 +41,22 @@ btnJoin.addEventListener("click", (e) => {
     method: "join",
     clientId: clientId,
   };
-  ws.send(JSON.stringify(payLoad));
+  ws.send(send_data(payLoad));
 });
 
 ws.addEventListener("message", (event) => {
-  const response = JSON.parse(event.data);
+  const response = get_data(event.data);
 
   if (response.method === "connect") {
     clientId = response.clientId;
     console.log("Client id Set successfully: " + clientId);
   }
-
   if (response.method === "join") {
     console.log("you joined");
     game_data = response.game;
   }
   if (response.method === "update") {
-    game_data = response.game_data
+    game_data = response.game_data;
   }
 });
 
@@ -84,7 +109,8 @@ function send_position() {
     clientId: clientId,
     position: { x: player_position_x, y: player_position_y },
   };
-  ws.send(JSON.stringify(payLoad));
+
+  ws.send(send_data(payLoad));
 }
 
 function play() {
