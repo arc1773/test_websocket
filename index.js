@@ -77,8 +77,9 @@ wsServer.on("request", (request) => {
     }
     if (result.method === "play") {
       const clientId = result.clientId;
-
-      game_data.clients[clientId].position = result.position;
+      if (game_data.clients[clientId].position) {
+        game_data.clients[clientId].position = result.position;
+      }
     }
   });
 
