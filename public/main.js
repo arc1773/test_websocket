@@ -2,9 +2,9 @@
 let clientId = null;
 
 var is_game = false;
-//let ws = new WebSocket(`wss://testwebsocket-production.up.railway.app:443`);
 let ws = new WebSocket(`wss://testwebsocket-production.up.railway.app:443`);
-//const btnJoin = document.getElementById("btnJoin");
+//let ws = new WebSocket(`ws://localhost:443`);
+
 
 //writing events
 var game_data = {};
@@ -19,7 +19,6 @@ btnJoin.addEventListener("click", (e) => {
 });
 
 ws.addEventListener("message", (event) => {
-  //message.data
   const response = JSON.parse(event.data);
 
   if (response.method === "connect") {
