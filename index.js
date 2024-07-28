@@ -39,7 +39,7 @@ app.use(express.static(path.join(__dirname, "public")));
 const httpServer = http.createServer(app);
 
 // Nasłuchiwanie na określonym porcie
-httpServer.listen(port, () => {
+httpServer.listen(PORT, () => {
   console.log(`App listening on port: ${PORT}`);
 });
 
