@@ -27,7 +27,7 @@ function get_data(data) {
 let clientId = null;
 
 var is_game = false;
-let ws = new WebSocket(`wss://testwebsocket-production.up.railway.app:443`);
+let ws = new WebSocket(`wss://test-websocket-ejmc.onrender.com:443`);
 //let ws = new WebSocket(`ws://localhost:443`);
 
 //ws.binaryType = "arraybuffer";

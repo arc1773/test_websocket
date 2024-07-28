@@ -30,7 +30,7 @@ const app = express();
 //const compression = require('compression');
 //app.use(compression());
 //const port = process.env.PORT || 8080;
-const port = 443;
+const PORT = process.env.PORT || 443;
 
 // Serwowanie statycznych plików z katalogu "public"
 app.use(express.static(path.join(__dirname, "public")));
@@ -40,30 +40,12 @@ const httpServer = http.createServer(app);
 
 // Nasłuchiwanie na określonym porcie
 httpServer.listen(port, () => {
-  console.log(`App listening on port: ${port}`);
+  console.log(`App listening on port: ${PORT}`);
 });
 
 // Utworzenie serwera WebSocket
 const wsServer = new WebSocketServer({
-  httpServer: httpServer,
-  perMessageDeflate: {
-    zlibDeflateOptions: {
-      // See zlib defaults.
-      chunkSize: 1024,
-      memLevel: 7,
-      level: 3
-    },
-    zlibInflateOptions: {
-      chunkSize: 10 * 1024
-    },
-    // Other options settable:
-    clientNoContextTakeover: true, // Defaults to negotiated value.
-    serverNoContextTakeover: true, // Defaults to negotiated value.
-    serverMaxWindowBits: 10, // Defaults to negotiated value.
-    // Below options specified as default values.
-    concurrencyLimit: 10, // Limits zlib concurrency for perf.
-    threshold: 1024 // Size (in bytes) below which messages
-}
+  httpServer: httpServer
 })
 const clients = {};
 const game_data = {
