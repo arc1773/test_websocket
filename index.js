@@ -103,7 +103,7 @@ function updateGameState() {
     clients[client].connection.send(send_data(payLoad));
   }
 
-  setTimeout(updateGameState, 20);
+  setTimeout(updateGameState, 1);
 }
 
 function S4() {

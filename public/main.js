@@ -30,7 +30,7 @@ var is_game = false;
 let ws = new WebSocket(`wss://testwebsocket-production.up.railway.app:443`);
 //let ws = new WebSocket(`ws://localhost:443`);
 
-ws.binaryType = "arraybuffer";
+//ws.binaryType = "arraybuffer";
 
 //writing events
 var game_data = {};
@@ -122,4 +122,4 @@ function play() {
   }
 }
 
-setInterval(play, 1000 / 60);
+setInterval(play, 1000 / 120);
